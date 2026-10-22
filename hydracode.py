@@ -52,6 +52,9 @@ def secrets_():
 
 
 def set_secret(pid, key):
+    h = _read(F["health"], {})
+    if h.pop(pid, None) is not None:
+        _write(F["health"], h)
     s = secrets_()
     if key:
         s[pid] = key
@@ -78,7 +81,7 @@ def http_json(url, body, headers, timeout=120):
         if e.code in (500, 502, 503, 504):
             raise HydraError("transient", f"{e.code} {msg}", 60)
         if e.code in (401, 403) or (e.code == 400 and "api key" in msg.lower()):
-            raise HydraError("auth", f"{e.code} {msg}", 900)
+            raise HydraError("auth", f"{e.code} {msg}", 86400)
         if e.code == 404:
             raise HydraError("model", f"404 {msg}", 3600)
         raise HydraError("other", f"{e.code} {msg}", 300)

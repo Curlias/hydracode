@@ -87,9 +87,9 @@ function svcs(){
 }
 function tile(v){
  const c=v.connected,paused=c===true&&v.cooldown;
- const cls=paused?"warn":c===true?"ok":"";
- const tag=paused?`<span class="tag warn">Sin cuota por ahora</span>`:c===true?`<span class="tag ok">Conectada</span>`:`<span class="tag">Sin conectar</span>`;
- const steps=c===true?"":`<ol class="steps">${(v.steps||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`;
+ const cls=v.problem?"bad":paused?"warn":c===true?"ok":"";
+ const tag=v.problem?`<span class="tag bad">Llave inválida</span>`:paused?`<span class="tag warn">Sin cuota por ahora</span>`:c===true?`<span class="tag ok">Conectada</span>`:`<span class="tag">Sin conectar</span>`;
+ const steps=c===true?"":v.problem?`<div class="msg" style="color:var(--bad)">La llave guardada no funciona. Crea una nueva y pulsa «Pegar llave y conectar».</div>`:`<ol class="steps">${(v.steps||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`;
  const main={oauth:["Conectar con OpenRouter","connect"],login:["Iniciar sesión","connect"],key:["Abrir página de llaves","connect"],local:["Descargar Ollama","connect"],terminal:["Abrir Terminal","connect"]}[v.how];
  let btns="";
  if(v.how==="key")btns=`<button class="${c===true?"":"pri"}" onclick="connect('${v.id}')">${c===true?"Conseguir otra llave":"Abrir página de llaves"}</button><button class="${c===true?"":"pri"}" onclick="pasteKey('${v.id}')">Pegar llave y conectar</button>`;

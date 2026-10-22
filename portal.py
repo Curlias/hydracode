@@ -89,7 +89,9 @@ def services(c, sec):
             ok = ollama_up()
         else:
             ok = True if recent_ok(s["providers"]) else None
-        out.append(dict(s, connected=ok, cooldown=cd, has_provider=bool(provs)))
+        bad = cd if cd and cd["kind"] == "auth" and s["how"] in ("key", "oauth") else None
+        out.append(dict(s, connected=False if bad else ok, cooldown=None if bad else cd,
+                        problem=bad["msg"] if bad else "", has_provider=bool(provs)))
     return out
 
 
