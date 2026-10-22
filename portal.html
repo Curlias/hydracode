@@ -4,106 +4,182 @@
 <style>
 :root{--bg:#f6f6f4;--card:#fff;--ink:#1c1c1a;--mute:#6b6b66;--line:#d9d9d4;--ok:#2f7d4f;--warn:#b7791f;--bad:#b03a2e;--acc:#2b4c7e}
 @media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#1f1f1d;--ink:#ecece8;--mute:#9a9a94;--line:#3a3a36;--ok:#5fb283;--warn:#d9a441;--bad:#e0675a;--acc:#7da2d6}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,system-ui,sans-serif}
-main{max-width:1100px;margin:0 auto;padding:24px 16px 60px}
-h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:28px 0 10px}.sub{color:var(--mute);margin:0 0 8px}
-.fill{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,system-ui,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:28px 16px 70px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:17px;margin:34px 0 4px;display:flex;gap:10px;align-items:center}
+h2 .n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--acc);color:#fff;font-size:13px}
+.sub{color:var(--mute);margin:0 0 14px}.lead{color:var(--mute);margin:0 0 6px;max-width:70ch}
+.by{font-size:12px;font-weight:400;color:var(--acc);text-decoration:none;margin-left:8px}.by:hover{text-decoration:underline}
+.fill{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
 .card.ok{border-color:var(--ok)}.card.warn{border-color:var(--warn)}.card.bad{border-color:var(--bad)}.card.off{opacity:.55}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sp{justify-content:space-between}
-.tag{font-size:11px;color:var(--mute);border:1px solid var(--line);border-radius:10px;padding:1px 7px}
-.bar{height:5px;background:var(--line);border-radius:3px;margin:8px 0;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
-button,input,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:5px 10px}
+.tag{font-size:12px;color:var(--mute);border:1px solid var(--line);border-radius:10px;padding:1px 8px;white-space:nowrap}
+.tag.ok{color:var(--ok);border-color:var(--ok)}.tag.warn{color:var(--warn);border-color:var(--warn)}.tag.bad{color:var(--bad);border-color:var(--bad)}
+button,input,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:7px;padding:6px 12px}
 button{cursor:pointer}button:hover{border-color:var(--acc)}button.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
+button.sm{padding:1px 8px;font-size:13px}button:disabled{opacity:.5;cursor:default}
 input[type=text],input[type=password],select{width:100%}label{display:block;font-size:12px;color:var(--mute);margin:8px 0 3px}
-.msg{font-size:12px;color:var(--mute);margin-top:6px;word-break:break-word}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
-@media(max-width:560px){.grid2{grid-template-columns:1fr}}
-code{font-size:12px}.by{font-size:12px;font-weight:400;color:var(--acc);text-decoration:none;margin-left:6px}.by:hover{text-decoration:underline}
+.msg{font-size:13px;color:var(--mute);margin-top:6px;word-break:break-word}
+ol.steps{margin:8px 0 0;padding-left:20px;font-size:13px;color:var(--mute)}ol.steps li{margin:2px 0}
+.banner{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--card);margin:6px 0 4px}
+.banner.ok{border-color:var(--ok)}.banner.warn{border-color:var(--warn)}.banner b{font-size:16px}
+.grp{font-size:13px;color:var(--mute);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.04em}
+.chain{list-style:none;margin:10px 0 0;padding:0}.chain li{display:flex;gap:6px;align-items:center;padding:5px 0;border-top:1px solid var(--line)}
+.chain li .nm{flex:1}.dot{width:9px;height:9px;border-radius:50%;background:var(--mute);flex:none}.dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.bad{background:var(--bad)}
+.res{margin:8px 0 0;padding:0;list-style:none;font-size:14px}.res li{padding:3px 0}.res .good{color:var(--ok)}.res .nope{color:var(--bad)}
+details{margin-top:34px}summary{cursor:pointer;font-size:17px;font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+footer{margin-top:44px;font-size:13px;color:var(--mute)}
 </style></head><body><main>
-<h1>Hydracode <a class="by" href="https://carlosplata.dev" target="_blank" rel="noopener">by carlosplata.dev</a></h1><p class="sub">Portal de conexiones · solo local (127.0.0.1) · las keys no se vuelven a mostrar</p>
-<h2>Conectar con un clic</h2><div id="svcs" class="fill"></div><div id="banner" class="msg"></div>
-<h2>Conexiones activas</h2><div id="provs" class="fill"></div>
-<h2>Conectar o editar</h2><div class="card" id="form"></div>
-<h2>Roles y cadena de fallback</h2><div id="roles" class="fill"></div>
-<footer class="msg" style="margin-top:40px">Hydracode · hecho por <a class="by" href="https://carlosplata.dev" target="_blank" rel="noopener">carlosplata.dev</a> · MIT</footer></main>
+<h1>Hydracode <a class="by" href="https://carlosplata.dev" target="_blank" rel="noopener">by carlosplata.dev</a></h1>
+<p class="lead">Hydracode conecta varias inteligencias artificiales (IAs) a Claude Code. Le pasa cada tarea a la más adecuada y, si a una se le acaba la cuota, usa la siguiente <b>sola</b>. Solo tienes que conectar tus IAs aquí. Todo se queda en tu computadora.</p>
+
+<div id="banner" class="banner"></div>
+
+<h2><span class="n">1</span>Conecta tus IAs</h2>
+<p class="sub">Con una sola conectada ya funciona. Mientras más conectes, menos te quedarás sin cuota.</p>
+<div id="svcs"></div>
+
+<h2><span class="n">2</span>Comprueba que funcionan</h2>
+<p class="sub">Le manda un «responde OK» a cada IA conectada para confirmar que contesta.</p>
+<div class="row"><button class="pri" id="btn-all" onclick="testAll()">Probar todo</button><span class="msg" id="all-msg"></span></div>
+<ul class="res" id="res"></ul>
+
+<h2><span class="n">3</span>¿Quién hace qué?</h2>
+<p class="sub">Cada tarea tiene una lista de IAs en orden. Hydracode intenta con la primera y, si no puede, pasa a la siguiente. Puedes reordenarlas.</p>
+<div id="roles" class="fill"></div>
+
+<details id="adv"><summary>Avanzado</summary>
+<p class="sub">Detalle técnico de cada conexión y formulario para agregar otras manualmente.</p>
+<h3 style="font-size:15px;margin:16px 0 8px">Conexiones</h3><div id="provs" class="fill"></div>
+<h3 style="font-size:15px;margin:22px 0 8px">Agregar o editar una conexión</h3><div class="card" id="form"></div>
+</details>
+
+<footer>Hydracode · hecho por <a class="by" style="margin:0" href="https://carlosplata.dev" target="_blank" rel="noopener">carlosplata.dev</a> · MIT · solo accesible desde tu computadora</footer>
+</main>
 <script>
-const CSRF="__CSRF__";let S=null;
+const CSRF="__CSRF__";let S=null,cur={},formDrawn=false;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 async function api(p,b){const r=await fetch(p,{method:b?"POST":"GET",headers:{"content-type":"application/json","x-csrf":CSRF},body:b?JSON.stringify(b):undefined});return r.json()}
-async function load(){S=await api("/api/state");draw();if(!drawn){drawn=true;form()}}
+const ROLE_INFO={leer:["Leer y resumir","Lee archivos largos y te los resume."],mecanico:["Tareas simples","Traducciones, cambios de formato y código repetitivo."],ask:["Preguntas rápidas","Dudas generales de programación."],planear:["Planear","Piensa el plan antes de programar. Va primero con Claude Opus 5.5."],revisar:["Revisar","Da una segunda opinión sobre tu código."]};
+const WHY={quota:"Se acabó la cuota por ahora; se reactiva sola.",auth:"La llave o la sesión no es válida. Vuelve a conectarla.",down:"No está encendida.",model:"Ese modelo ya no existe; elige otro en Avanzado.",transient:"Está saturada ahora mismo; prueba en un minuto.",other:"Respondió con un error."};
+const why=(k,e)=>WHY[k]||e||"Falló";
+
+async function load(){S=await api("/api/state");draw();if(!formDrawn){formDrawn=true;form()}}
+function usable(p){return p.enabled!==false&&(p.kind==="cli"||p.has_key||p.has_env||p.need_key===false)}
+
+function draw(){banner();svcs();roles();provs()}
+
+function banner(){
+ const n=S.services.filter(v=>v.connected===true&&v.how!=="local").length,paused=S.services.filter(v=>v.connected===true&&v.cooldown).length;
+ const b=$("#banner");
+ if(!n){b.className="banner warn";b.innerHTML="<b>Empieza aquí</b><div class='msg'>Todavía no hay ninguna IA conectada. Te recomendamos <b>OpenRouter</b> (un clic) o <b>Gemini</b>, ambas gratis.</div>"}
+ else{b.className="banner ok";b.innerHTML=`<b>Todo listo: ${n} IA${n>1?"s":""} conectada${n>1?"s":""}</b><div class='msg'>Ya puedes usar hydracode desde Claude Code.${paused?` ${paused} está${paused>1?"n":""} en pausa por cuota y volverá${paused>1?"n":""} sola${paused>1?"s":""}.`:""} Pulsa «Probar todo» para confirmar.</div>`}
+}
+
 function svcs(){
- $("#svcs").innerHTML=S.services.map(v=>{
-  const c=v.connected,cls=c===true?(v.cooldown?"warn":"ok"):"";
-  const st=c===true?(v.cooldown?`Conectado · en pausa (${esc(v.cooldown.kind)})`:"Conectado ✓"):c===false?"Sin conectar":"Sin verificar · pulsa Probar";
-  const lbl={oauth:"Iniciar sesión con OpenRouter",login:"Iniciar sesión",key:"1 · Conseguir key",local:"Abrir / instalar",terminal:"Iniciar sesión"}[v.how];
-  return `<div class="card ${cls}"><div class="row sp"><b>${esc(v.name)}</b><span class="tag">${esc(st)}</span></div>
-  <div class="msg">${esc(v.desc)}</div>
-  <div class="row" style="margin-top:10px"><button class="${c===true?"":"pri"}" onclick="connect('${v.id}')">${c===true&&v.how!=="key"?"Reconectar":lbl}</button>
-  ${v.how==="key"?`<button class="pri" onclick="pasteKey('${v.id}')">2 · Pegar y conectar</button>`:""}
-  ${v.has_provider?`<button onclick="testSvc('${v.id}')">Probar</button>`:""}</div><div class="msg" id="s-${v.id}"></div></div>`}).join("")}
+ const order=["Gratis","Con tu suscripción","En tu computadora","Requiere créditos"];
+ $("#svcs").innerHTML=order.map(g=>{
+  const list=S.services.filter(v=>v.group===g);if(!list.length)return"";
+  return `<div class="grp">${esc(g)}</div><div class="fill">${list.map(tile).join("")}</div>`}).join("");
+}
+function tile(v){
+ const c=v.connected,paused=c===true&&v.cooldown;
+ const cls=paused?"warn":c===true?"ok":"";
+ const tag=paused?`<span class="tag warn">Sin cuota por ahora</span>`:c===true?`<span class="tag ok">Conectada</span>`:`<span class="tag">Sin conectar</span>`;
+ const steps=c===true?"":`<ol class="steps">${(v.steps||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`;
+ const main={oauth:["Conectar con OpenRouter","connect"],login:["Iniciar sesión","connect"],key:["Abrir página de llaves","connect"],local:["Descargar Ollama","connect"],terminal:["Abrir Terminal","connect"]}[v.how];
+ let btns="";
+ if(v.how==="key")btns=`<button class="${c===true?"":"pri"}" onclick="connect('${v.id}')">${c===true?"Conseguir otra llave":"Abrir página de llaves"}</button><button class="${c===true?"":"pri"}" onclick="pasteKey('${v.id}')">Pegar llave y conectar</button>`;
+ else if(c===true&&v.how!=="local")btns=`<button onclick="connect('${v.id}')">Volver a iniciar sesión</button>`;
+ else if(!(c===true&&v.how==="local"))btns=`<button class="pri" onclick="connect('${v.id}')">${main[0]}</button>`;
+ if(v.has_provider)btns+=`<button onclick="testSvc('${v.id}')">Probar</button>`;
+ return `<div class="card ${cls}"><div class="row sp"><b>${esc(v.name)}</b>${tag}</div><div class="msg" style="margin-top:2px">${esc(v.desc)}</div>${steps}
+  <div class="row" style="margin-top:12px">${btns}</div><div class="msg" id="s-${v.id}"></div></div>`}
+
 function say(id,t){const e=$("#s-"+id);if(e)e.textContent=t}
 async function connect(id){const r=await api("/api/connect",{service:id});say(id,r.msg||"");if(r.open)window.open(r.open,"_blank","noopener");
  if(r.poll){let n=0;const t=setInterval(async()=>{await load();if(++n>20||S.services.find(x=>x.id===id).connected)clearInterval(t)},3000)}else load()}
-async function pasteKey(id){let k="";try{k=await navigator.clipboard.readText()}catch{return say(id,"Permite el acceso al portapapeles o pega la key en el formulario de abajo.")}
- say(id,"probando…");const r=await api("/api/paste",{service:id,key:k});
- say(id,r.ok?`Conectado · ${r.ms} ms · agregado a los roles leer, mecanico y ask`:`${r.kind||"error"}: ${r.err}`);load()}
-async function testSvc(id){const v=S.services.find(x=>x.id===id);say(id,"probando…");const out=[];
- for(const p of v.providers){if(S.providers[p]){const r=await api("/api/test",{id:p});out.push(`${p}: ${r.ok?"OK "+r.ms+" ms":r.kind+" "+r.err}`)}}say(id,out.join(" · "));load()}
-function draw(){
- svcs();
+async function pasteKey(id){let k="";try{k=await navigator.clipboard.readText()}catch{return say(id,"Tu navegador no dejó leer lo copiado. Permite el acceso al portapapeles o pega la llave en Avanzado.")}
+ say(id,"Probando…");const r=await api("/api/paste",{service:id,key:k});
+ say(id,r.ok?`Listo: conectada (${r.ms} ms) y agregada a tus tareas.`:r.kind==="clipboard"?r.err:`No funcionó: ${why(r.kind,r.err)}`);load()}
+async function testSvc(id){const v=S.services.find(x=>x.id===id);say(id,"Probando…");const out=[];
+ for(const p of v.providers){if(S.providers[p]){const r=await api("/api/test",{id:p});out.push(`${S.providers[p].label||p}: ${r.ok?"responde en "+(r.ms/1000).toFixed(1)+" s":why(r.kind,r.err)}`)}}say(id,out.join(" · "));load()}
+
+async function testAll(){
+ const ids=Object.values(S.providers).filter(usable).map(p=>p.id),ul=$("#res"),btn=$("#btn-all");
+ btn.disabled=true;ul.innerHTML="";let ok=0;
+ for(const id of ids){const p=S.providers[id];$("#all-msg").textContent=`Probando ${p.label||id}… (${ok}/${ids.length})`;
+  const r=await api("/api/test",{id});if(r.ok)ok++;
+  ul.insertAdjacentHTML("beforeend",`<li class="${r.ok?"good":"nope"}">${r.ok?"✓":"✗"} <b>${esc(p.label||id)}</b> — ${r.ok?"responde en "+(r.ms/1000).toFixed(1)+" s":esc(why(r.kind,r.err))}</li>`)}
+ $("#all-msg").textContent=`${ok} de ${ids.length} funcionan.`;btn.disabled=false;load()}
+
+function roles(){
+ $("#roles").innerHTML=Object.entries(S.roles).map(([n,r])=>{
+  const [title,desc]=ROLE_INFO[n]||[n,"Tarea personalizada."];
+  const items=r.chain.map((id,i)=>{const p=S.providers[id];if(!p)return"";
+   const u=S.usage[id]||{},st=!usable(p)?"":u.cooldown?(u.cooldown.kind==="quota"?"warn":"bad"):"ok";
+   const skip=r.private&&!p.private_ok;
+   return `<li><span class="dot ${skip?"":st}"></span><span class="nm" style="${skip?"opacity:.5;text-decoration:line-through":""}">${i+1}. ${esc(p.label||id)}${skip?` <span class="tag">no se usa: no apta para código privado</span>`:""}${!usable(p)?` <span class="tag">sin conectar</span>`:""}</span>
+    <button class="sm" ${i?"":"disabled"} title="Subir" onclick="move('${esc(n)}',${i},-1)">↑</button><button class="sm" ${i<r.chain.length-1?"":"disabled"} title="Bajar" onclick="move('${esc(n)}',${i},1)">↓</button><button class="sm" title="Quitar" onclick="rm('${esc(n)}','${esc(id)}')">✕</button></li>`}).join("");
+  const free=Object.values(S.providers).filter(p=>!r.chain.includes(p.id));
+  return `<div class="card"><b>${esc(title)}</b><div class="msg" style="margin-top:2px">${esc(desc)}</div>
+   <label style="display:flex;gap:6px;align-items:center;margin-top:10px;font-size:13px;color:var(--ink)" title="Los servicios gratis pueden usar lo que les envías para entrenar. Si tu tarea incluye código privado, marca esto."><input type="checkbox" ${r.private?"checked":""} onchange="setPriv('${esc(n)}',this.checked)"> Solo IAs de confianza (para código privado)</label>
+   <ul class="chain">${items}</ul>
+   ${free.length?`<div class="row" style="margin-top:8px"><select style="width:auto;flex:1" id="add-${esc(n)}"><option value="">+ Agregar otra IA…</option>${free.map(p=>`<option value="${esc(p.id)}">${esc(p.label||p.id)}</option>`).join("")}</select><button onclick="addTo('${esc(n)}')">Agregar</button></div>`:""}</div>`}).join("")}
+async function saveRole(n,chain,priv){await api("/api/role",{name:n,chain,private:priv});load()}
+function move(n,i,d){const ch=[...S.roles[n].chain];[ch[i],ch[i+d]]=[ch[i+d],ch[i]];saveRole(n,ch,S.roles[n].private)}
+function rm(n,id){saveRole(n,S.roles[n].chain.filter(x=>x!==id),S.roles[n].private)}
+function addTo(n){const v=$("#add-"+n).value;if(v)saveRole(n,[...S.roles[n].chain,v],S.roles[n].private)}
+function setPriv(n,v){saveRole(n,S.roles[n].chain,v)}
+
+function provs(){
  $("#provs").innerHTML=Object.values(S.providers).map(p=>{
   const u=S.usage[p.id]||{},cd=u.cooldown;
-  const keyed=p.kind==="cli"?"CLI local":(p.has_key?"key guardada":p.has_env?"key del entorno":(p.need_key===false?"sin key":"falta key"));
-  const cls=!p.enabled?"off":cd?(cd.kind==="quota"?"warn":"bad"):(p.kind!=="cli"&&p.need_key!==false&&!p.has_key&&!p.has_env)?"bad":"ok";
-  const st=cd?`en pausa (${esc(cd.kind)}) hasta ${new Date(cd.until*1000).toLocaleTimeString()}<br>${esc(cd.msg)}`:`hoy: ${u.ok||0}/${u.calls||0} ok · ${u.tokens||0} tokens`;
-  return `<div class="card ${cls}" id="c-${esc(p.id)}"><div class="row sp"><b>${esc(p.label||p.id)}</b><span class="tag">${esc(p.kind)}</span></div>
-  <div class="msg">${esc(p.model||(p.cmd||[]).join(" ").slice(0,60))} · ${keyed}${p.private_ok?" · apto privado":""}</div>
-  ${u.pct!=null?`<div class="bar"><i style="width:${Math.min(100,u.pct)}%"></i></div><div class="msg">${u.pct}% del límite diario</div>`:""}
-  <div class="msg">${st}</div>
+  const keyed=p.kind==="cli"?"programa local":(p.has_key?"llave guardada":p.has_env?"llave del entorno":(p.need_key===false?"sin llave":"falta la llave"));
+  const cls=!p.enabled?"off":cd?(cd.kind==="quota"?"warn":"bad"):usable(p)?"ok":"bad";
+  const st=cd?`En pausa: ${esc(why(cd.kind,cd.msg))}`:`Hoy: ${u.ok||0} de ${u.calls||0} llamadas bien · ${u.tokens||0} tokens`;
+  return `<div class="card ${cls}"><div class="row sp"><b>${esc(p.label||p.id)}</b><span class="tag">${esc(p.kind)}</span></div>
+  <div class="msg">${esc(p.model||(p.cmd||[]).join(" ").slice(0,60))} · ${keyed}</div>
+  ${u.pct!=null?`<div class="msg">${u.pct}% del límite diario</div>`:""}<div class="msg">${st}</div>
   <div class="row" style="margin-top:10px"><button onclick="test('${esc(p.id)}')">Probar</button><button onclick="edit('${esc(p.id)}')">Editar</button>
-  ${cd?`<button onclick="reset('${esc(p.id)}')">Reactivar</button>`:""}${p.kind!=="cli"?`<button onclick="models('${esc(p.id)}')">Modelos</button>`:""}</div>
-  <div class="msg" id="m-${esc(p.id)}"></div></div>`}).join("");
- $("#roles").innerHTML=Object.entries(S.roles).map(([n,r])=>`<div class="card"><div class="row sp"><b>${esc(n)}</b>
-  <label style="margin:0"><input type="checkbox" ${r.private?"checked":""} onchange="role('${esc(n)}',null,this.checked)"> privado</label></div>
-  <label>Cadena (ids separados por coma, en orden)</label><input type="text" value="${esc(r.chain.join(", "))}" onchange="role('${esc(n)}',this.value)">
-  <div class="msg">${r.chain.map(x=>S.providers[x]?esc(x):`<s>${esc(x)}</s>`).join(" → ")}</div>
-  <div class="row" style="margin-top:8px"><button onclick="delRole('${esc(n)}')">Borrar rol</button></div></div>`).join("")+
-  `<div class="card"><b>Nuevo rol</b><label>Nombre</label><input type="text" id="nr" placeholder="ej. traducir"><div class="row" style="margin-top:8px"><button onclick="newRole()">Crear</button></div></div>`;
-}
-let cur={},drawn=false;
+  ${cd?`<button onclick="reset('${esc(p.id)}')">Reactivar</button>`:""}${p.kind!=="cli"?`<button onclick="models('${esc(p.id)}')">Ver modelos</button>`:""}</div>
+  <div class="msg" id="m-${esc(p.id)}"></div></div>`}).join("")}
+async function test(id){const m=$("#m-"+id);m.textContent="Probando…";const r=await api("/api/test",{id});
+ const t=r.ok?`Responde en ${(r.ms/1000).toFixed(1)} s`:why(r.kind,r.err);await load();const m2=$("#m-"+id);if(m2)m2.textContent=t}
+async function reset(id){await api("/api/reset",{id});load()}
+async function models(id){const m=$("#m-"+id);m.textContent="Consultando…";const r=await api("/api/models",{id});m.textContent=r.ok?r.models.join(", "):r.err}
+
 function form(p){
  cur=p||cur;const f=cur;
- $("#form").innerHTML=`<div class="row"><select id="pre" onchange="preset(this.value)" style="max-width:260px"><option value="">Plantilla…</option>${S.presets.map((x,i)=>`<option value="${i}">${esc(x.name)}</option>`).join("")}</select></div>
- <div class="grid2"><div><label>ID</label><input type="text" id="f-id" value="${esc(f.id)}"></div><div><label>Nombre</label><input type="text" id="f-label" value="${esc(f.label)}"></div>
+ $("#form").innerHTML=`<div class="row"><select id="pre" onchange="preset(this.value)" style="max-width:280px"><option value="">Empezar desde una plantilla…</option>${S.presets.map((x,i)=>`<option value="${i}">${esc(x.name)}</option>`).join("")}</select></div>
+ <div class="grid2"><div><label>Identificador (sin espacios)</label><input type="text" id="f-id" value="${esc(f.id)}"></div><div><label>Nombre visible</label><input type="text" id="f-label" value="${esc(f.label)}"></div>
  <div><label>Tipo</label><select id="f-kind">${["openai","gemini","cli"].map(k=>`<option ${f.kind===k?"selected":""}>${k}</option>`).join("")}</select></div>
  <div><label>Modelo</label><input type="text" id="f-model" value="${esc(f.model)}"></div>
- <div><label>URL base (openai)</label><input type="text" id="f-base_url" value="${esc(f.base_url)}"></div>
- <div><label>Variable de entorno de la key (opcional)</label><input type="text" id="f-env" value="${esc(f.env)}"></div>
- <div style="grid-column:1/-1"><label>Comando (cli), JSON, usa {prompt}</label><input type="text" id="f-cmd" value="${esc(f.cmd?JSON.stringify(f.cmd):"")}"></div>
- <div><label>Key (se guarda en ~/.config/hydracode, permisos 600)</label><input type="password" id="f-key" autocomplete="off" placeholder="${f.id&&S.providers[f.id]&&S.providers[f.id].has_key?"guardada · escribe para reemplazar":""}"></div>
+ <div><label>Dirección del servicio (tipo openai)</label><input type="text" id="f-base_url" value="${esc(f.base_url)}"></div>
+ <div><label>Variable de entorno de la llave (opcional)</label><input type="text" id="f-env" value="${esc(f.env)}"></div>
+ <div style="grid-column:1/-1"><label>Comando (tipo cli), en JSON, con {prompt}</label><input type="text" id="f-cmd" value="${esc(f.cmd?JSON.stringify(f.cmd):"")}"></div>
+ <div><label>Llave (se guarda solo en tu computadora)</label><input type="password" id="f-key" autocomplete="off" placeholder="${f.id&&S.providers[f.id]&&S.providers[f.id].has_key?"guardada · escribe para reemplazar":""}"></div>
  <div><label>Límite diario de tokens (opcional)</label><input type="text" id="f-daily" value="${esc(f.daily_tokens)}"></div></div>
- <div class="row" style="margin-top:10px"><label style="margin:0"><input type="checkbox" id="f-priv" ${f.private_ok?"checked":""}> apto para código privado</label>
- <label style="margin:0"><input type="checkbox" id="f-en" ${f.enabled===false?"":"checked"}> activo</label></div>
+ <div class="row" style="margin-top:10px"><label style="margin:0"><input type="checkbox" id="f-priv" ${f.private_ok?"checked":""}> apta para código privado</label>
+ <label style="margin:0"><input type="checkbox" id="f-en" ${f.enabled===false?"":"checked"}> activa</label></div>
  <div class="row" style="margin-top:12px"><button class="pri" onclick="save()">Guardar</button><button onclick="cur={};form()">Limpiar</button><span class="msg" id="f-msg"></span></div>`}
 function preset(i){if(i==="")return;form({...S.presets[i]})}
-function edit(id){form({...S.providers[id]});scrollTo({top:document.body.scrollHeight/3,behavior:"smooth"})}
+function edit(id){document.querySelector("#adv").open=true;form({...S.providers[id]});$("#form").scrollIntoView({behavior:"smooth"})}
 async function save(){
  const v=k=>$("#f-"+k).value.trim(),kind=v("kind");let cmd;
- if(kind==="cli"){try{cmd=JSON.parse(v("cmd"))}catch{return $("#f-msg").textContent="cmd no es JSON válido"}}
+ if(kind==="cli"){try{cmd=JSON.parse(v("cmd"))}catch{return $("#f-msg").textContent="El comando no es un JSON válido"}}
  const body={id:v("id"),label:v("label"),kind,model:v("model"),base_url:v("base_url"),env:v("env"),private_ok:$("#f-priv").checked,enabled:$("#f-en").checked,
   need_key:cur.need_key,daily_tokens:v("daily")?parseInt(v("daily")):undefined};
  if(cmd)body.cmd=cmd;
  const r=await api("/api/provider",body);if(!r.ok)return $("#f-msg").textContent=r.err;
  const id=body.id.toLowerCase(),k=v("key");if(k)await api("/api/secret",{id,key:k});
  cur={};await load();form();test(id)}
-async function test(id){const m=$("#m-"+id);m.textContent="probando…";const r=await api("/api/test",{id});
- m.textContent=r.ok?`OK · ${r.ms} ms · «${r.text}»`:`${r.kind}: ${r.err}`;await load();const m2=$("#m-"+id);if(m2)m2.textContent=r.ok?`OK · ${r.ms} ms`:`${r.kind}: ${r.err}`}
-async function reset(id){await api("/api/reset",{id});load()}
-async function models(id){const m=$("#m-"+id);m.textContent="consultando…";const r=await api("/api/models",{id});m.textContent=r.ok?r.models.join(", "):r.err}
-async function role(n,txt,priv){const r=S.roles[n];await api("/api/role",{name:n,chain:txt!=null?txt.split(",").map(x=>x.trim()).filter(Boolean):r.chain,private:priv!=null?priv:r.private});load()}
-async function newRole(){const n=$("#nr").value.trim().toLowerCase();if(n){await api("/api/role",{name:n,chain:[],private:false});load()}}
-async function delRole(n){if(confirm("¿Borrar el rol "+n+"?")){await api("/api/role-delete",{name:n});load()}}
-const q=new URLSearchParams(location.search);if(q.get('oauth')){$('#banner').textContent=q.get('oauth')==='ok'?'OpenRouter conectado.':(q.get('msg')||'Falló el login');history.replaceState(null,'','/')}
-load();setInterval(()=>{if(!document.activeElement||!["INPUT","SELECT"].includes(document.activeElement.tagName))load()},15000);
+
+const q=new URLSearchParams(location.search);
+if(q.get("oauth")){history.replaceState(null,"","/")}
+load().then(()=>{if(q.get("oauth"))$("#banner").insertAdjacentHTML("beforeend",`<div class="msg">${q.get("oauth")==="ok"?"OpenRouter conectado.":esc(q.get("msg")||"Falló el inicio de sesión.")}</div>`)});
+setInterval(()=>{const a=document.activeElement;if(!a||!["INPUT","SELECT","TEXTAREA"].includes(a.tagName))load()},15000);
 </script></body></html>

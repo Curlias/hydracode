@@ -2,47 +2,66 @@
  {
   "id": "openrouter",
   "name": "OpenRouter",
-  "desc": "Login con navegador · muchos modelos gratis",
+  "desc": "Muchas IAs gratis con una sola cuenta. La más fácil de conectar.",
   "how": "oauth",
   "preset": "openrouter",
   "providers": [
    "openrouter"
+  ],
+  "group": "Gratis",
+  "steps": [
+   "Pulsa el botón e inicia sesión en OpenRouter (puedes entrar con Google)."
   ]
  },
  {
   "id": "codex",
   "name": "ChatGPT / Codex",
-  "desc": "Usa tu cuenta de ChatGPT",
+  "desc": "Usa tu cuenta de ChatGPT, sin pagar extra.",
   "how": "login",
   "login": "codex",
   "providers": [
    "codex"
+  ],
+  "group": "Con tu suscripción",
+  "steps": [
+   "Pulsa el botón e inicia sesión con tu cuenta de ChatGPT."
   ]
  },
  {
   "id": "claude",
   "name": "Claude",
-  "desc": "Usa tu cuenta de Anthropic",
+  "desc": "Usa tu cuenta de Claude. Incluye Opus 5.5 para planear.",
   "how": "login",
   "login": "claude",
   "providers": [
    "claude-haiku",
-   "claude-sonnet"
+   "claude-sonnet",
+   "claude-opus"
+  ],
+  "group": "Con tu suscripción",
+  "steps": [
+   "Pulsa el botón e inicia sesión con tu cuenta de Anthropic."
   ]
  },
  {
   "id": "agy",
   "name": "Antigravity",
-  "desc": "Abre la terminal para iniciar sesión, luego Probar",
+  "desc": "Antigravity, la IA de Google para programar.",
   "how": "terminal",
   "providers": [
    "agy"
+  ],
+  "group": "Con tu suscripción",
+  "steps": [
+   "Pulsa el botón: se abre la Terminal con Antigravity.",
+   "Inicia sesión ahí con tu cuenta de Google.",
+   "Vuelve aquí y pulsa «Probar»."
   ]
  },
  {
   "id": "gemini",
   "name": "Gemini (AI Studio)",
-  "desc": "Key gratis de Google",
+  "desc": "La IA de Google. Rápida y con cuota diaria gratis.",
   "how": "key",
   "keys_url": "https://aistudio.google.com/apikey",
   "preset": "gemini-x",
@@ -50,39 +69,61 @@
    "gemini-lite",
    "gemini-flash"
   ],
-  "shared_env": "GEMINI_API_KEY"
+  "shared_env": "GEMINI_API_KEY",
+  "group": "Gratis",
+  "steps": [
+   "Abre la página y entra con tu cuenta de Google.",
+   "Pulsa «Create API key» y copia la llave que aparece.",
+   "Vuelve aquí y pulsa «Pegar y conectar»."
+  ]
  },
  {
   "id": "xai",
   "name": "Grok (xAI)",
-  "desc": "Key de console.x.ai · puede requerir créditos de pago",
+  "desc": "Grok de xAI. Normalmente hay que cargar saldo.",
   "how": "key",
   "keys_url": "https://console.x.ai",
   "preset": "xai",
   "providers": [
    "xai"
+  ],
+  "group": "Requiere créditos",
+  "steps": [
+   "Abre la página y crea una llave.",
+   "Cópiala y pulsa «Pegar y conectar»."
   ]
  },
  {
   "id": "groq",
   "name": "Groq",
-  "desc": "Key gratis, muy rápido",
+  "desc": "Muy rápida. Cuota gratis generosa.",
   "how": "key",
   "keys_url": "https://console.groq.com/keys",
   "preset": "groq",
   "providers": [
    "groq"
+  ],
+  "group": "Gratis",
+  "steps": [
+   "Abre la página y crea tu cuenta.",
+   "Pulsa «Create API Key» y copia la llave.",
+   "Vuelve aquí y pulsa «Pegar y conectar»."
   ]
  },
  {
   "id": "ollama",
   "name": "Ollama (local)",
-  "desc": "Modelos en tu Mac, sin cuota",
+  "desc": "Funciona sin internet y sin cuotas. Es el respaldo final. Se instala con el instalador.",
   "how": "local",
   "keys_url": "https://ollama.com/download",
   "preset": "ollama",
   "providers": [
    "ollama"
+  ],
+  "group": "En tu computadora",
+  "steps": [
+   "Si aún no la tienes, pulsa el botón para descargar Ollama.",
+   "Ábrela una vez y listo."
   ]
  }
 ]
