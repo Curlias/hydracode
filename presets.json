@@ -1,0 +1,84 @@
+[
+ {
+  "name": "Groq",
+  "kind": "openai",
+  "id": "groq",
+  "label": "Groq",
+  "base_url": "https://api.groq.com/openai/v1",
+  "model": "llama-3.3-70b-versatile",
+  "env": "GROQ_API_KEY"
+ },
+ {
+  "name": "Cerebras",
+  "kind": "openai",
+  "id": "cerebras",
+  "label": "Cerebras",
+  "base_url": "https://api.cerebras.ai/v1",
+  "model": "llama-3.3-70b",
+  "env": "CEREBRAS_API_KEY"
+ },
+ {
+  "name": "Grok (xAI)",
+  "kind": "openai",
+  "id": "xai",
+  "label": "Grok (xAI)",
+  "base_url": "https://api.x.ai/v1",
+  "model": "grok-4.1-fast",
+  "env": "XAI_API_KEY"
+ },
+ {
+  "name": "OpenRouter (free)",
+  "kind": "openai",
+  "id": "openrouter",
+  "label": "OpenRouter",
+  "base_url": "https://openrouter.ai/api/v1",
+  "model": "meta-llama/llama-3.3-70b-instruct:free",
+  "env": "OPENROUTER_API_KEY"
+ },
+ {
+  "name": "Mistral",
+  "kind": "openai",
+  "id": "mistral",
+  "label": "Mistral",
+  "base_url": "https://api.mistral.ai/v1",
+  "model": "mistral-small-latest",
+  "env": "MISTRAL_API_KEY"
+ },
+ {
+  "name": "Ollama (local)",
+  "kind": "openai",
+  "id": "ollama",
+  "label": "Ollama local",
+  "base_url": "http://localhost:11434/v1",
+  "model": "qwen2.5-coder",
+  "need_key": false,
+  "private_ok": true
+ },
+ {
+  "name": "Gemini API",
+  "kind": "gemini",
+  "id": "gemini-x",
+  "label": "Gemini",
+  "model": "gemini-3.5-flash",
+  "env": "GEMINI_API_KEY"
+ },
+ {
+  "name": "OpenAI-compatible (otro)",
+  "kind": "openai",
+  "id": "custom",
+  "label": "Custom",
+  "base_url": "https://",
+  "model": ""
+ },
+ {
+  "name": "CLI (comando)",
+  "kind": "cli",
+  "id": "mi-cli",
+  "label": "Mi CLI",
+  "cmd": [
+   "comando",
+   "-p",
+   "{prompt}"
+  ]
+ }
+]

@@ -1,0 +1,88 @@
+[
+ {
+  "id": "openrouter",
+  "name": "OpenRouter",
+  "desc": "Login con navegador · muchos modelos gratis",
+  "how": "oauth",
+  "preset": "openrouter",
+  "providers": [
+   "openrouter"
+  ]
+ },
+ {
+  "id": "codex",
+  "name": "ChatGPT / Codex",
+  "desc": "Usa tu cuenta de ChatGPT",
+  "how": "login",
+  "login": "codex",
+  "providers": [
+   "codex"
+  ]
+ },
+ {
+  "id": "claude",
+  "name": "Claude",
+  "desc": "Usa tu cuenta de Anthropic",
+  "how": "login",
+  "login": "claude",
+  "providers": [
+   "claude-haiku",
+   "claude-sonnet"
+  ]
+ },
+ {
+  "id": "agy",
+  "name": "Antigravity",
+  "desc": "Inicia sesión una vez ejecutando agy en la terminal",
+  "how": "terminal",
+  "providers": [
+   "agy"
+  ]
+ },
+ {
+  "id": "gemini",
+  "name": "Gemini (AI Studio)",
+  "desc": "Key gratis de Google",
+  "how": "key",
+  "keys_url": "https://aistudio.google.com/apikey",
+  "preset": "gemini-x",
+  "providers": [
+   "gemini-lite",
+   "gemini-flash"
+  ],
+  "shared_env": "GEMINI_API_KEY"
+ },
+ {
+  "id": "xai",
+  "name": "Grok (xAI)",
+  "desc": "Key de console.x.ai · puede requerir créditos de pago",
+  "how": "key",
+  "keys_url": "https://console.x.ai",
+  "preset": "xai",
+  "providers": [
+   "xai"
+  ]
+ },
+ {
+  "id": "groq",
+  "name": "Groq",
+  "desc": "Key gratis, muy rápido",
+  "how": "key",
+  "keys_url": "https://console.groq.com/keys",
+  "preset": "groq",
+  "providers": [
+   "groq"
+  ]
+ },
+ {
+  "id": "ollama",
+  "name": "Ollama (local)",
+  "desc": "Modelos en tu Mac, sin cuota",
+  "how": "local",
+  "keys_url": "https://ollama.com/download",
+  "preset": "ollama",
+  "providers": [
+   "ollama"
+  ]
+ }
+]

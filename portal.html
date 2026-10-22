@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hydracode</title>
+<style>
+:root{--bg:#f6f6f4;--card:#fff;--ink:#1c1c1a;--mute:#6b6b66;--line:#d9d9d4;--ok:#2f7d4f;--warn:#b7791f;--bad:#b03a2e;--acc:#2b4c7e}
+@media(prefers-color-scheme:dark){:root{--bg:#161615;--card:#1f1f1d;--ink:#ecece8;--mute:#9a9a94;--line:#3a3a36;--ok:#5fb283;--warn:#d9a441;--bad:#e0675a;--acc:#7da2d6}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:20px;margin:0 0 4px}h2{font-size:15px;margin:28px 0 10px}.sub{color:var(--mute);margin:0 0 8px}
+.fill{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px}
+.card.ok{border-color:var(--ok)}.card.warn{border-color:var(--warn)}.card.bad{border-color:var(--bad)}.card.off{opacity:.55}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sp{justify-content:space-between}
+.tag{font-size:11px;color:var(--mute);border:1px solid var(--line);border-radius:10px;padding:1px 7px}
+.bar{height:5px;background:var(--line);border-radius:3px;margin:8px 0;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
+button,input,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:5px 10px}
+button{cursor:pointer}button:hover{border-color:var(--acc)}button.pri{background:var(--acc);color:#fff;border-color:var(--acc)}
+input[type=text],input[type=password],select{width:100%}label{display:block;font-size:12px;color:var(--mute);margin:8px 0 3px}
+.msg{font-size:12px;color:var(--mute);margin-top:6px;word-break:break-word}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+code{font-size:12px}.by{font-size:12px;font-weight:400;color:var(--acc);text-decoration:none;margin-left:6px}.by:hover{text-decoration:underline}
+</style></head><body><main>
+<h1>Hydracode <a class="by" href="https://carlosplata.dev" target="_blank" rel="noopener">by carlosplata.dev</a></h1><p class="sub">Portal de conexiones · solo local (127.0.0.1) · las keys no se vuelven a mostrar</p>
+<h2>Conectar con un clic</h2><div id="svcs" class="fill"></div><div id="banner" class="msg"></div>
+<h2>Conexiones activas</h2><div id="provs" class="fill"></div>
+<h2>Conectar o editar</h2><div class="card" id="form"></div>
+<h2>Roles y cadena de fallback</h2><div id="roles" class="fill"></div>
+<footer class="msg" style="margin-top:40px">Hydracode · hecho por <a class="by" href="https://carlosplata.dev" target="_blank" rel="noopener">carlosplata.dev</a> · MIT</footer></main>
+<script>
+const CSRF="__CSRF__";let S=null;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+async function api(p,b){const r=await fetch(p,{method:b?"POST":"GET",headers:{"content-type":"application/json","x-csrf":CSRF},body:b?JSON.stringify(b):undefined});return r.json()}
+async function load(){S=await api("/api/state");draw();if(!drawn){drawn=true;form()}}
+function svcs(){
+ $("#svcs").innerHTML=S.services.map(v=>{
+  const c=v.connected,cls=c===true?(v.cooldown?"warn":"ok"):"";
+  const st=c===true?(v.cooldown?`Conectado · en pausa (${esc(v.cooldown.kind)})`:"Conectado ✓"):c===false?"Sin conectar":"Sesión por verificar";
+  const lbl={oauth:"Iniciar sesión con OpenRouter",login:"Iniciar sesión",key:"1 · Conseguir key",local:"Abrir / instalar",terminal:"Cómo conectar"}[v.how];
+  return `<div class="card ${cls}"><div class="row sp"><b>${esc(v.name)}</b><span class="tag">${esc(st)}</span></div>
+  <div class="msg">${esc(v.desc)}</div>
+  <div class="row" style="margin-top:10px"><button class="${c===true?"":"pri"}" onclick="connect('${v.id}')">${c===true&&v.how!=="key"?"Reconectar":lbl}</button>
+  ${v.how==="key"?`<button class="pri" onclick="pasteKey('${v.id}')">2 · Pegar y conectar</button>`:""}
+  ${v.has_provider?`<button onclick="testSvc('${v.id}')">Probar</button>`:""}</div><div class="msg" id="s-${v.id}"></div></div>`}).join("")}
+function say(id,t){const e=$("#s-"+id);if(e)e.textContent=t}
+async function connect(id){const r=await api("/api/connect",{service:id});say(id,r.msg||"");if(r.open)window.open(r.open,"_blank","noopener");
+ if(r.poll){let n=0;const t=setInterval(async()=>{await load();if(++n>20||S.services.find(x=>x.id===id).connected)clearInterval(t)},3000)}else load()}
+async function pasteKey(id){let k="";try{k=await navigator.clipboard.readText()}catch{return say(id,"Permite el acceso al portapapeles o pega la key en el formulario de abajo.")}
+ say(id,"probando…");const r=await api("/api/paste",{service:id,key:k});
+ say(id,r.ok?`Conectado · ${r.ms} ms · agregado a los roles leer, mecanico y ask`:`${r.kind||"error"}: ${r.err}`);load()}
+async function testSvc(id){const v=S.services.find(x=>x.id===id);say(id,"probando…");const out=[];
+ for(const p of v.providers){if(S.providers[p]){const r=await api("/api/test",{id:p});out.push(`${p}: ${r.ok?"OK "+r.ms+" ms":r.kind+" "+r.err}`)}}say(id,out.join(" · "));load()}
+function draw(){
+ svcs();
+ $("#provs").innerHTML=Object.values(S.providers).map(p=>{
+  const u=S.usage[p.id]||{},cd=u.cooldown;
+  const keyed=p.kind==="cli"?"CLI local":(p.has_key?"key guardada":p.has_env?"key del entorno":(p.need_key===false?"sin key":"falta key"));
+  const cls=!p.enabled?"off":cd?(cd.kind==="quota"?"warn":"bad"):(p.kind!=="cli"&&p.need_key!==false&&!p.has_key&&!p.has_env)?"bad":"ok";
+  const st=cd?`en pausa (${esc(cd.kind)}) hasta ${new Date(cd.until*1000).toLocaleTimeString()}<br>${esc(cd.msg)}`:`hoy: ${u.ok||0}/${u.calls||0} ok · ${u.tokens||0} tokens`;
+  return `<div class="card ${cls}" id="c-${esc(p.id)}"><div class="row sp"><b>${esc(p.label||p.id)}</b><span class="tag">${esc(p.kind)}</span></div>
+  <div class="msg">${esc(p.model||(p.cmd||[]).join(" ").slice(0,60))} · ${keyed}${p.private_ok?" · apto privado":""}</div>
+  ${u.pct!=null?`<div class="bar"><i style="width:${Math.min(100,u.pct)}%"></i></div><div class="msg">${u.pct}% del límite diario</div>`:""}
+  <div class="msg">${st}</div>
+  <div class="row" style="margin-top:10px"><button onclick="test('${esc(p.id)}')">Probar</button><button onclick="edit('${esc(p.id)}')">Editar</button>
+  ${cd?`<button onclick="reset('${esc(p.id)}')">Reactivar</button>`:""}${p.kind!=="cli"?`<button onclick="models('${esc(p.id)}')">Modelos</button>`:""}</div>
+  <div class="msg" id="m-${esc(p.id)}"></div></div>`}).join("");
+ $("#roles").innerHTML=Object.entries(S.roles).map(([n,r])=>`<div class="card"><div class="row sp"><b>${esc(n)}</b>
+  <label style="margin:0"><input type="checkbox" ${r.private?"checked":""} onchange="role('${esc(n)}',null,this.checked)"> privado</label></div>
+  <label>Cadena (ids separados por coma, en orden)</label><input type="text" value="${esc(r.chain.join(", "))}" onchange="role('${esc(n)}',this.value)">
+  <div class="msg">${r.chain.map(x=>S.providers[x]?esc(x):`<s>${esc(x)}</s>`).join(" → ")}</div>
+  <div class="row" style="margin-top:8px"><button onclick="delRole('${esc(n)}')">Borrar rol</button></div></div>`).join("")+
+  `<div class="card"><b>Nuevo rol</b><label>Nombre</label><input type="text" id="nr" placeholder="ej. traducir"><div class="row" style="margin-top:8px"><button onclick="newRole()">Crear</button></div></div>`;
+}
+let cur={},drawn=false;
+function form(p){
+ cur=p||cur;const f=cur;
+ $("#form").innerHTML=`<div class="row"><select id="pre" onchange="preset(this.value)" style="max-width:260px"><option value="">Plantilla…</option>${S.presets.map((x,i)=>`<option value="${i}">${esc(x.name)}</option>`).join("")}</select></div>
+ <div class="grid2"><div><label>ID</label><input type="text" id="f-id" value="${esc(f.id)}"></div><div><label>Nombre</label><input type="text" id="f-label" value="${esc(f.label)}"></div>
+ <div><label>Tipo</label><select id="f-kind">${["openai","gemini","cli"].map(k=>`<option ${f.kind===k?"selected":""}>${k}</option>`).join("")}</select></div>
+ <div><label>Modelo</label><input type="text" id="f-model" value="${esc(f.model)}"></div>
+ <div><label>URL base (openai)</label><input type="text" id="f-base_url" value="${esc(f.base_url)}"></div>
+ <div><label>Variable de entorno de la key (opcional)</label><input type="text" id="f-env" value="${esc(f.env)}"></div>
+ <div style="grid-column:1/-1"><label>Comando (cli), JSON, usa {prompt}</label><input type="text" id="f-cmd" value="${esc(f.cmd?JSON.stringify(f.cmd):"")}"></div>
+ <div><label>Key (se guarda en ~/.config/hydracode, permisos 600)</label><input type="password" id="f-key" autocomplete="off" placeholder="${f.id&&S.providers[f.id]&&S.providers[f.id].has_key?"guardada · escribe para reemplazar":""}"></div>
+ <div><label>Límite diario de tokens (opcional)</label><input type="text" id="f-daily" value="${esc(f.daily_tokens)}"></div></div>
+ <div class="row" style="margin-top:10px"><label style="margin:0"><input type="checkbox" id="f-priv" ${f.private_ok?"checked":""}> apto para código privado</label>
+ <label style="margin:0"><input type="checkbox" id="f-en" ${f.enabled===false?"":"checked"}> activo</label></div>
+ <div class="row" style="margin-top:12px"><button class="pri" onclick="save()">Guardar</button><button onclick="cur={};form()">Limpiar</button><span class="msg" id="f-msg"></span></div>`}
+function preset(i){if(i==="")return;form({...S.presets[i]})}
+function edit(id){form({...S.providers[id]});scrollTo({top:document.body.scrollHeight/3,behavior:"smooth"})}
+async function save(){
+ const v=k=>$("#f-"+k).value.trim(),kind=v("kind");let cmd;
+ if(kind==="cli"){try{cmd=JSON.parse(v("cmd"))}catch{return $("#f-msg").textContent="cmd no es JSON válido"}}
+ const body={id:v("id"),label:v("label"),kind,model:v("model"),base_url:v("base_url"),env:v("env"),private_ok:$("#f-priv").checked,enabled:$("#f-en").checked,
+  need_key:cur.need_key,daily_tokens:v("daily")?parseInt(v("daily")):undefined};
+ if(cmd)body.cmd=cmd;
+ const r=await api("/api/provider",body);if(!r.ok)return $("#f-msg").textContent=r.err;
+ const id=body.id.toLowerCase(),k=v("key");if(k)await api("/api/secret",{id,key:k});
+ cur={};await load();form();test(id)}
+async function test(id){const m=$("#m-"+id);m.textContent="probando…";const r=await api("/api/test",{id});
+ m.textContent=r.ok?`OK · ${r.ms} ms · «${r.text}»`:`${r.kind}: ${r.err}`;await load();const m2=$("#m-"+id);if(m2)m2.textContent=r.ok?`OK · ${r.ms} ms`:`${r.kind}: ${r.err}`}
+async function reset(id){await api("/api/reset",{id});load()}
+async function models(id){const m=$("#m-"+id);m.textContent="consultando…";const r=await api("/api/models",{id});m.textContent=r.ok?r.models.join(", "):r.err}
+async function role(n,txt,priv){const r=S.roles[n];await api("/api/role",{name:n,chain:txt!=null?txt.split(",").map(x=>x.trim()).filter(Boolean):r.chain,private:priv!=null?priv:r.private});load()}
+async function newRole(){const n=$("#nr").value.trim().toLowerCase();if(n){await api("/api/role",{name:n,chain:[],private:false});load()}}
+async function delRole(n){if(confirm("¿Borrar el rol "+n+"?")){await api("/api/role-delete",{name:n});load()}}
+const q=new URLSearchParams(location.search);if(q.get('oauth')){$('#banner').textContent=q.get('oauth')==='ok'?'OpenRouter conectado.':(q.get('msg')||'Falló el login');history.replaceState(null,'','/')}
+load();setInterval(()=>{if(!document.activeElement||!["INPUT","SELECT"].includes(document.activeElement.tagName))load()},15000);
+</script></body></html>

@@ -1,0 +1,18 @@
+{
+  "providers": {
+    "gemini-lite":  {"id":"gemini-lite","label":"Gemini 3.5 Flash Lite","kind":"gemini","model":"gemini-3.5-flash-lite","env":"GEMINI_API_KEY","enabled":true,"private_ok":false,"daily_tokens":1000000},
+    "gemini-flash": {"id":"gemini-flash","label":"Gemini 3.5 Flash","kind":"gemini","model":"gemini-3.5-flash","env":"GEMINI_API_KEY","enabled":true,"private_ok":false,"daily_tokens":250000},
+    "agy":          {"id":"agy","label":"Antigravity CLI","kind":"cli","cmd":["agy","-p","{prompt}"],"enabled":true,"private_ok":false},
+    "claude-haiku": {"id":"claude-haiku","label":"Claude Haiku","kind":"cli","cmd":["claude","-p","{prompt}","--model","haiku"],"enabled":true,"private_ok":true},
+    "claude-sonnet":{"id":"claude-sonnet","label":"Claude Sonnet","kind":"cli","cmd":["claude","-p","{prompt}","--model","sonnet"],"enabled":true,"private_ok":true},
+    "ollama":       {"id":"ollama","label":"Ollama local","kind":"openai","base_url":"http://localhost:11434/v1","model":"qwen2.5-coder:1.5b","need_key":false,"enabled":true,"private_ok":true},
+    "codex":        {"id":"codex","label":"Codex (ChatGPT)","kind":"cli","cmd":["codex","exec","--skip-git-repo-check","-s","read-only","{prompt}"],"enabled":true,"private_ok":true}
+  },
+  "roles": {
+    "leer":     {"private": false, "chain": ["gemini-lite","agy","ollama","claude-haiku"]},
+    "mecanico": {"private": false, "chain": ["gemini-lite","gemini-flash","agy","ollama","claude-haiku"]},
+    "ask":      {"private": false, "chain": ["gemini-flash","agy","ollama","claude-haiku"]},
+    "planear":  {"private": true,  "chain": ["codex","claude-sonnet","ollama","agy"]},
+    "revisar":  {"private": true,  "chain": ["codex","claude-sonnet","ollama","agy"]}
+  }
+}
