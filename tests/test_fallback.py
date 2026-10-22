@@ -38,6 +38,18 @@ class Fallback(unittest.TestCase):
         self.assertEqual(oct(os.stat(h.F["sec"]).st_mode)[-3:], "600")
 
 
+class Ram(unittest.TestCase):
+    def test_free_gb_is_positive(self):
+        self.assertGreater(h.free_gb(), 0)
+
+    def test_low_ram_skips_local_model(self):
+        h.save_config({"providers": {"loc": dict(id="loc", kind="ollama", model="m", need_key=False,
+                       base_url="http://127.0.0.1:9", min_free_gb=10**6)}, "roles": {}})
+        with self.assertRaises(h.HydraError) as cm:
+            h.attempt(h.config()["providers"]["loc"], "x", "hola")
+        self.assertEqual(cm.exception.kind, "lowram")
+
+
 class Bar(unittest.TestCase):
     def test_bar_renders_two_lines_without_crashing(self):
         h.save_config({"providers": {"ok": dict(id="ok", **cli("print(1)"))}, "roles": {}})

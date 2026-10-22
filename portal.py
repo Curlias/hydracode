@@ -199,6 +199,8 @@ def list_models(pid):
     key = hydracode.secret(p)
     if p["kind"] == "gemini":
         url, h = "https://generativelanguage.googleapis.com/v1beta/models?pageSize=100", {"x-goog-api-key": key}
+    elif p["kind"] == "ollama":
+        url, h = p.get("base_url", "http://localhost:11434").rstrip("/") + "/api/tags", {}
     elif p["kind"] == "openai":
         url, h = p["base_url"].rstrip("/") + "/models", ({"authorization": "Bearer " + key} if key else {})
     else:

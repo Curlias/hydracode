@@ -140,7 +140,47 @@ def call_cli(p, system, prompt):
     return out, len(full) // 4, len(out) // 4
 
 
-CALLS = {"openai": call_openai, "gemini": call_gemini, "cli": call_cli}
+def free_gb():
+    """RAM disponible aproximada (libre + inactiva + especulativa en macOS; MemAvailable en Linux)."""
+    try:
+        if sys.platform == "darwin":
+            out = subprocess.run(["vm_stat"], capture_output=True, text=True, timeout=3).stdout
+            ps = int(out.split("page size of ")[1].split()[0])
+            pg = {k: int(v.strip(" .")) for k, v in (ln.split(":") for ln in out.splitlines() if ":" in ln and "Pages" in ln)}
+            return (pg["Pages free"] + pg["Pages inactive"] + pg["Pages speculative"]) * ps / 2**30
+        for ln in open("/proc/meminfo"):
+            if ln.startswith("MemAvailable"):
+                return int(ln.split()[1]) / 2**20
+    except Exception:
+        pass
+    return 99.0
+
+
+def _ollama_loaded(base):
+    try:
+        with urllib.request.urlopen(base + "/api/ps", timeout=2) as r:
+            return [m.get("name") for m in json.load(r).get("models", [])]
+    except Exception:
+        return []
+
+
+def call_ollama(p, system, prompt):
+    base = p.get("base_url", "http://localhost:11434").rstrip("/")
+    need, free = p.get("min_free_gb", 2.5), free_gb()
+    if free < need and p["model"] not in _ollama_loaded(base):
+        raise HydraError("lowram", f"poca RAM libre ({free:.1f} GB, mínimo {need})", 120)
+    d = http_json(base + "/api/chat",
+                  {"model": p["model"], "stream": False, "keep_alive": p.get("keep_alive", "30s"),
+                   "options": {"num_ctx": p.get("num_ctx", 4096)},
+                   "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}]},
+                  {}, p.get("timeout", 400))
+    text = (d.get("message") or {}).get("content", "")
+    if not text:
+        raise HydraError("other", "respuesta vacía", 300)
+    return text, d.get("prompt_eval_count", 0), d.get("eval_count", 0)
+
+
+CALLS = {"openai": call_openai, "gemini": call_gemini, "cli": call_cli, "ollama": call_ollama}
 
 
 def log(pid, role, ok, ti=0, to=0, ms=0, err=""):
@@ -317,7 +357,7 @@ def bar(raw):
     for pid, p in c["providers"].items():
         if not p.get("enabled", True):
             continue
-        local = p["kind"] == "openai" and p.get("need_key") is False
+        local = p["kind"] in ("openai", "ollama") and p.get("need_key") is False
         if not (p["kind"] == "cli" or local or secret(p)):
             continue
         u, g = sm.get(pid, {}), pid.split("-")[0]
@@ -329,8 +369,8 @@ def bar(raw):
         if off:
             rank, chip = 0, _c(240, f"○ {g}")
         elif cd:
-            lab = {"quota": "cuota", "auth": "login", "down": "off", "model": "modelo"}.get(cd["kind"], cd["kind"])
-            rank, chip = (2, _c(179, f"⏳ {g} {lab}")) if cd["kind"] == "quota" else (3, _c(167, f"✗ {g} {lab}"))
+            lab = {"quota": "cuota", "auth": "login", "down": "off", "model": "modelo", "lowram": "poca RAM"}.get(cd["kind"], cd["kind"])
+            rank, chip = (2, _c(179, f"⏳ {g} {lab}")) if cd["kind"] in ("quota", "lowram") else (3, _c(167, f"✗ {g} {lab}"))
         elif u.get("pct") is not None and u["pct"] >= 80:
             rank, chip = 2, _c(179, f"● {g} {u['pct']}%")
         else:
@@ -384,6 +424,8 @@ def main(argv):
         if argv[1:2] == ["install"]:
             return bar_install("--force" in argv)
         print(bar(sys.stdin.read() if not sys.stdin.isatty() else ""))
+    elif cmd == "ram":
+        print(f"{free_gb():.1f} GB libres")
     elif cmd == "set-model":
         c = config()
         c["providers"][argv[1]]["model"] = argv[2]

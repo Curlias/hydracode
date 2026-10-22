@@ -64,7 +64,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 async function api(p,b){const r=await fetch(p,{method:b?"POST":"GET",headers:{"content-type":"application/json","x-csrf":CSRF},body:b?JSON.stringify(b):undefined});return r.json()}
 const ROLE_INFO={leer:["Leer y resumir","Lee archivos largos y te los resume."],mecanico:["Tareas simples","Traducciones, cambios de formato y código repetitivo."],ask:["Preguntas rápidas","Dudas generales de programación."],planear:["Planear","Piensa el plan antes de programar. Va primero con Claude Opus 5.5."],revisar:["Revisar","Da una segunda opinión sobre tu código."]};
-const WHY={quota:"Se acabó la cuota por ahora; se reactiva sola.",auth:"La llave o la sesión no es válida. Vuelve a conectarla.",down:"No está encendida.",model:"Ese modelo ya no existe; elige otro en Avanzado.",transient:"Está saturada ahora mismo; prueba en un minuto.",other:"Respondió con un error."};
+const WHY={quota:"Se acabó la cuota por ahora; se reactiva sola.",auth:"La llave o la sesión no es válida. Vuelve a conectarla.",down:"No está encendida.",model:"Ese modelo ya no existe; elige otro en Avanzado.",lowram:"Hay poca memoria libre; se salta para no trabar tu computadora.",transient:"Está saturada ahora mismo; prueba en un minuto.",other:"Respondió con un error."};
 const why=(k,e)=>WHY[k]||e||"Falló";
 
 async function load(){S=await api("/api/state");draw();if(!formDrawn){formDrawn=true;form()}}
@@ -156,7 +156,7 @@ function form(p){
  cur=p||cur;const f=cur;
  $("#form").innerHTML=`<div class="row"><select id="pre" onchange="preset(this.value)" style="max-width:280px"><option value="">Empezar desde una plantilla…</option>${S.presets.map((x,i)=>`<option value="${i}">${esc(x.name)}</option>`).join("")}</select></div>
  <div class="grid2"><div><label>Identificador (sin espacios)</label><input type="text" id="f-id" value="${esc(f.id)}"></div><div><label>Nombre visible</label><input type="text" id="f-label" value="${esc(f.label)}"></div>
- <div><label>Tipo</label><select id="f-kind">${["openai","gemini","cli"].map(k=>`<option ${f.kind===k?"selected":""}>${k}</option>`).join("")}</select></div>
+ <div><label>Tipo</label><select id="f-kind">${["openai","gemini","ollama","cli"].map(k=>`<option ${f.kind===k?"selected":""}>${k}</option>`).join("")}</select></div>
  <div><label>Modelo</label><input type="text" id="f-model" value="${esc(f.model)}"></div>
  <div><label>Dirección del servicio (tipo openai)</label><input type="text" id="f-base_url" value="${esc(f.base_url)}"></div>
  <div><label>Variable de entorno de la llave (opcional)</label><input type="text" id="f-env" value="${esc(f.env)}"></div>

@@ -13,6 +13,8 @@ cd hydracode && ./install.sh
 
 Por defecto instala también [Ollama](https://ollama.com) y descarga `qwen2.5-coder:7b` (~4.7 GB) como respaldo local. Con menos de 16 GB de RAM baja solo a `3b` (~1.9 GB), y con menos de 8 GB a `1.5b`; `HYDRACODE_MODEL=... ./install.sh` fuerza uno como respaldo local sin cuota. Usa `./install.sh --no-ollama` para omitirlo. En Linux el instalador usa el script oficial de Ollama (`curl | sh`).
 
+Para no trabar el equipo, Ollama se llama con su API nativa: el modelo se descarga de la RAM a los 30 s (`keep_alive`), el contexto se limita a 4096 y, si hay menos de `min_free_gb` de RAM libre (2.5 por defecto), hydracode se salta Ollama y pasa a la siguiente IA. Los tres valores se editan en el portal (Avanzado).
+
 Requiere Python 3.9+, sin dependencias externas.
 
 ## Uso

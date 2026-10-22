@@ -63,12 +63,15 @@
     "ollama": {
       "id": "ollama",
       "label": "Ollama local",
-      "kind": "openai",
-      "base_url": "http://localhost:11434/v1",
-      "model": "qwen2.5-coder:7b",
+      "kind": "ollama",
+      "base_url": "http://localhost:11434",
+      "model": "qwen2.5-coder:3b",
       "need_key": false,
       "enabled": true,
-      "private_ok": true
+      "private_ok": true,
+      "keep_alive": "30s",
+      "num_ctx": 4096,
+      "min_free_gb": 2.5
     },
     "codex": {
       "id": "codex",
