@@ -33,7 +33,7 @@
  {
   "id": "agy",
   "name": "Antigravity",
-  "desc": "Inicia sesión una vez ejecutando agy en la terminal",
+  "desc": "Abre la terminal para iniciar sesión, luego Probar",
   "how": "terminal",
   "providers": [
    "agy"

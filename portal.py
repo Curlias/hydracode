@@ -48,6 +48,24 @@ def login_status(name):
     return res
 
 
+def recent_ok(pids, days=7):
+    cut = time.time() - days * 86400
+    try:
+        with open(hydracode.F["usage"], "rb") as f:
+            f.seek(max(0, f.seek(0, 2) - 200_000))
+            rows = f.read().decode("utf-8", "replace").splitlines()[1:]
+    except OSError:
+        return False
+    for ln in reversed(rows):
+        try:
+            d = json.loads(ln)
+        except ValueError:
+            continue
+        if d["p"] in pids and d["t"] >= cut:
+            return bool(d["ok"])
+    return False
+
+
 def ollama_up():
     try:
         urllib.request.urlopen("http://localhost:11434/api/tags", timeout=1.5)
@@ -70,7 +88,7 @@ def services(c, sec):
         elif s["how"] == "local":
             ok = ollama_up()
         else:
-            ok = None
+            ok = True if recent_ok(s["providers"]) else None
         out.append(dict(s, connected=ok, cooldown=cd, has_provider=bool(provs)))
     return out
 
@@ -146,7 +164,12 @@ def connect(b):
         ensure_provider(sv)
         return dict(ok=True, open=None if ollama_up() else sv["keys_url"],
                     msg="Ollama activo; usa «Modelos» para elegir uno." if ollama_up() else "Instala Ollama y descarga un modelo (ollama pull qwen2.5-coder).")
-    return dict(ok=True, msg="Ejecuta `agy` en la terminal para iniciar sesión.")
+    if hydracode.sys.platform == "darwin":
+        subprocess.Popen(["osascript", "-e", 'tell application "Terminal" to do script "agy"',
+                          "-e", 'tell application "Terminal" to activate'],
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return dict(ok=True, msg="Se abrió la terminal con agy: inicia sesión ahí y luego pulsa «Probar».")
+    return dict(ok=True, msg="Ejecuta `agy` en tu terminal para iniciar sesión y luego pulsa «Probar».")
 
 
 def paste(b):

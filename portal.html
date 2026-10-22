@@ -35,8 +35,8 @@ async function load(){S=await api("/api/state");draw();if(!drawn){drawn=true;for
 function svcs(){
  $("#svcs").innerHTML=S.services.map(v=>{
   const c=v.connected,cls=c===true?(v.cooldown?"warn":"ok"):"";
-  const st=c===true?(v.cooldown?`Conectado · en pausa (${esc(v.cooldown.kind)})`:"Conectado ✓"):c===false?"Sin conectar":"Sesión por verificar";
-  const lbl={oauth:"Iniciar sesión con OpenRouter",login:"Iniciar sesión",key:"1 · Conseguir key",local:"Abrir / instalar",terminal:"Cómo conectar"}[v.how];
+  const st=c===true?(v.cooldown?`Conectado · en pausa (${esc(v.cooldown.kind)})`:"Conectado ✓"):c===false?"Sin conectar":"Sin verificar · pulsa Probar";
+  const lbl={oauth:"Iniciar sesión con OpenRouter",login:"Iniciar sesión",key:"1 · Conseguir key",local:"Abrir / instalar",terminal:"Iniciar sesión"}[v.how];
   return `<div class="card ${cls}"><div class="row sp"><b>${esc(v.name)}</b><span class="tag">${esc(st)}</span></div>
   <div class="msg">${esc(v.desc)}</div>
   <div class="row" style="margin-top:10px"><button class="${c===true?"":"pri"}" onclick="connect('${v.id}')">${c===true&&v.how!=="key"?"Reconectar":lbl}</button>
