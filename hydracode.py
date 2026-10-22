@@ -77,7 +77,7 @@ def http_json(url, body, headers, timeout=120):
             raise HydraError("quota", f"429 {msg}", int(ra) if ra.isdigit() else 3600)
         if e.code in (500, 502, 503, 504):
             raise HydraError("transient", f"{e.code} {msg}", 60)
-        if e.code in (401, 403):
+        if e.code in (401, 403) or (e.code == 400 and "api key" in msg.lower()):
             raise HydraError("auth", f"{e.code} {msg}", 900)
         if e.code == 404:
             raise HydraError("model", f"404 {msg}", 3600)
@@ -95,7 +95,8 @@ def call_openai(p, system, prompt):
     d = http_json(p["base_url"].rstrip("/") + "/chat/completions",
                   {"model": p["model"], "messages": [{"role": "system", "content": system},
                                                      {"role": "user", "content": prompt}]},
-                  {"authorization": "Bearer " + key} if key else {})
+                  {"authorization": "Bearer " + key} if key else {},
+                  p.get("timeout", 120 if p.get("need_key", True) else 400))
     u = d.get("usage") or {}
     try:
         text = d["choices"][0]["message"]["content"]
@@ -252,9 +253,123 @@ def status_line():
     return " · ".join(parts)
 
 
+def _c(n, t):
+    return f"\033[38;5;{n}m{t}\033[0m"
+
+
+def _dim(t):
+    return _c(244, t)
+
+
+def _up(host, port):
+    import socket
+    try:
+        socket.create_connection((host, port), 0.15).close()
+        return True
+    except OSError:
+        return False
+
+
+def bar(raw):
+    """Barra de estado de Claude Code: línea 1 sesión, línea 2 rutas de hydracode."""
+    try:
+        d = json.loads(raw or "{}")
+    except ValueError:
+        d = {}
+    sep = _dim("  │  ")
+    m = d.get("model") or {}
+    l1 = [f"\033[1;48;5;24;38;5;255m ◆ hydracode \033[0m"]
+    name = m.get("display_name") or (m.get("id") or "").replace("claude-", "")
+    if name:
+        l1.append(_c(111, name))
+    pct = (d.get("context_window") or {}).get("used_percentage")
+    if pct is not None:
+        pct = round(float(pct))
+        n = min(10, pct // 10)
+        col = 114 if pct < 60 else 179 if pct < 80 else 167
+        l1.append(_dim("ctx ") + _c(col, "▰" * n) + _dim("▱" * (10 - n)) + _c(col, f" {pct}%"))
+    rl = d.get("rate_limits") or {}
+    for key, lab in (("five_hour", "5h"), ("seven_day", "7d")):
+        w = rl.get(key) or {}
+        if w.get("used_percentage") is not None:
+            p = round(float(w["used_percentage"]))
+            t = f"{lab} {p}%"
+            left = int(w.get("resets_at") or 0) - time.time()
+            if key == "five_hour" and left > 0:
+                t += f" ↺{int(left // 3600)}h{int(left % 3600 // 60):02d}"
+            l1.append(_c(114 if p < 60 else 179 if p < 80 else 167, t))
+    cwd = (d.get("workspace") or {}).get("current_dir") or d.get("cwd") or ""
+    if cwd:
+        tail = os.path.basename(cwd.rstrip("/"))
+        try:
+            head = (pathlib.Path(cwd) / ".git/HEAD").read_text().strip()
+            tail += " ⎇ " + head.rsplit("/", 1)[-1][:24]
+        except OSError:
+            pass
+        l1.append(_dim(tail))
+    out = [sep.join(l1)]
+
+    try:
+        c, sm = config(), summary()
+    except Exception:
+        return out[0]
+    groups = {}
+    for pid, p in c["providers"].items():
+        if not p.get("enabled", True):
+            continue
+        local = p["kind"] == "openai" and p.get("need_key") is False
+        if not (p["kind"] == "cli" or local or secret(p)):
+            continue
+        u, g = sm.get(pid, {}), pid.split("-")[0]
+        cd = u.get("cooldown")
+        off = False
+        if local:
+            host = (p["base_url"].split("//")[-1].split("/")[0] + ":80").split(":")
+            off = not _up(host[0], int(host[1]))
+        if off:
+            rank, chip = 0, _c(240, f"○ {g}")
+        elif cd:
+            lab = {"quota": "cuota", "auth": "login", "down": "off", "model": "modelo"}.get(cd["kind"], cd["kind"])
+            rank, chip = (2, _c(179, f"⏳ {g} {lab}")) if cd["kind"] == "quota" else (3, _c(167, f"✗ {g} {lab}"))
+        elif u.get("pct") is not None and u["pct"] >= 80:
+            rank, chip = 2, _c(179, f"● {g} {u['pct']}%")
+        else:
+            rank, chip = 1, _c(114, "●") + " " + g
+        if rank >= groups.get(g, (-1, ""))[0]:
+            groups[g] = (rank, chip)
+    chips = [v[1] for v in groups.values()]
+    l2 = [_dim(" · ").join(chips)]
+    try:
+        with open(F["usage"], "rb") as f:
+            f.seek(0, 2)
+            f.seek(max(0, f.tell() - 4096))
+            rows = [json.loads(x) for x in f.read().decode("utf-8", "replace").splitlines()[1:] if x.strip()]
+        last = next((r for r in reversed(rows) if r.get("role") != "test"), None)
+        if last and time.time() - last["t"] < 600:
+            l2.append(_dim("↳ ") + f"{last['role']} → {last['p']}" + _dim(f" {last['ms'] / 1000:.1f}s") +
+                      ("" if last["ok"] else _c(167, " ✗")))
+    except (OSError, ValueError, KeyError):
+        pass
+    out.append(sep.join(l2))
+    return "\n".join(out)
+
+
+def bar_install(force):
+    p = pathlib.Path.home() / ".claude/settings.json"
+    s = _read(p, {})
+    if s.get("statusLine") and not force:
+        print("Ya hay una statusLine configurada; usa --force para reemplazarla.")
+        return 1
+    exe = SKILL / "hydracode.py"
+    s["statusLine"] = {"type": "command", "command": f"python3 {exe} bar", "padding": 0}
+    p.write_text(json.dumps(s, indent=2, ensure_ascii=False))
+    print("statusLine instalada en", p)
+    return 0
+
+
 def main(argv):
     if not argv or argv[0] in ("-h", "--help"):
-        print(f"hydracode {VERSION} · by carlosplata.dev\n" + __doc__.split("\n", 1)[1] + "\n  hydracode status | test <id> | portal [puerto] | roles | --version")
+        print(f"hydracode {VERSION} · by carlosplata.dev\n" + __doc__.split("\n", 1)[1] + "\n  hydracode status | test <id> | portal [puerto] | roles | bar [install] | set-model <id> <modelo> | --version")
         return 0
     cmd = argv[0]
     if cmd in ("--version", "-V"):
@@ -265,6 +380,14 @@ def main(argv):
     elif cmd == "roles":
         for n, r in config()["roles"].items():
             print(f"{n}{' [privado]' if r.get('private') else ''}: {' → '.join(r['chain'])}")
+    elif cmd == "bar":
+        if argv[1:2] == ["install"]:
+            return bar_install("--force" in argv)
+        print(bar(sys.stdin.read() if not sys.stdin.isatty() else ""))
+    elif cmd == "set-model":
+        c = config()
+        c["providers"][argv[1]]["model"] = argv[2]
+        save_config(c)
     elif cmd == "test":
         print(json.dumps(test(argv[1]), ensure_ascii=False))
     elif cmd == "portal":

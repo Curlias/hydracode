@@ -4,7 +4,14 @@ set -euo pipefail
 SRC="$(cd "$(dirname "$0")" && pwd)"
 DEST="${HYDRACODE_SKILL_DIR:-$HOME/.claude/skills/hydracode}"
 BIN="${HYDRACODE_BIN_DIR:-$HOME/.local/bin}"
-MODEL="qwen2.5-coder:1.5b"
+MEM_GB=0
+if [ "$(uname)" = Darwin ]; then MEM_GB=$(( $(sysctl -n hw.memsize) / 1073741824 ))
+elif [ -r /proc/meminfo ]; then MEM_GB=$(( $(awk '/MemTotal/{print $2}' /proc/meminfo) / 1048576 )); fi
+# 7b por defecto; con poca RAM baja a un modelo que quepa sin swap. HYDRACODE_MODEL fuerza uno.
+MODEL="qwen2.5-coder:7b"
+if [ "$MEM_GB" -gt 0 ] && [ "$MEM_GB" -lt 16 ]; then MODEL="qwen2.5-coder:3b"; fi
+if [ "$MEM_GB" -gt 0 ] && [ "$MEM_GB" -lt 8 ]; then MODEL="qwen2.5-coder:1.5b"; fi
+MODEL="${HYDRACODE_MODEL:-$MODEL}"
 OLLAMA=1; LINK=0
 for a in "$@"; do
   case "$a" in
@@ -33,7 +40,7 @@ if [ "$OLLAMA" = 1 ]; then
   if ! command -v ollama >/dev/null; then
     echo "→ Instalando Ollama (modelos locales, sin cuota)…"
     if [ "$(uname)" = Darwin ] && command -v brew >/dev/null; then
-      brew install ollama
+      brew install --cask ollama-app
     elif [ "$(uname)" = Linux ]; then
       curl -fsSL https://ollama.com/install.sh | sh
     else
@@ -43,11 +50,15 @@ if [ "$OLLAMA" = 1 ]; then
   if command -v ollama >/dev/null; then
     if ! curl -fs http://localhost:11434/api/tags >/dev/null 2>&1; then
       echo "→ Iniciando el servidor de Ollama…"
-      (brew services start ollama >/dev/null 2>&1 || nohup ollama serve >/dev/null 2>&1 &)
-      for _ in 1 2 3 4 5 6 7 8; do curl -fs http://localhost:11434/api/tags >/dev/null 2>&1 && break; sleep 1; done
+      if [ "$(uname)" = Darwin ]; then open -a Ollama 2>/dev/null || (nohup ollama serve >/dev/null 2>&1 &); else (nohup ollama serve >/dev/null 2>&1 &); fi
+      for _ in $(seq 1 20); do curl -fs http://localhost:11434/api/tags >/dev/null 2>&1 && break; sleep 1; done
     fi
-    echo "→ Descargando el modelo $MODEL (~1 GB)…"
-    ollama pull "$MODEL" || echo "! No se pudo descargar el modelo; hazlo luego con: ollama pull $MODEL" >&2
+    echo "→ Descargando el modelo $MODEL (${MEM_GB} GB de RAM detectados)…"
+    if ollama pull "$MODEL"; then
+      python3 "$DEST/hydracode.py" set-model ollama "$MODEL"
+    else
+      echo "! No se pudo descargar el modelo; hazlo luego con: ollama pull $MODEL" >&2
+    fi
   fi
 else
   echo "· Ollama omitido (--no-ollama). Hydracode funciona sin él, pero sin fallback local."

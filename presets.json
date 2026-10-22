@@ -50,7 +50,7 @@
   "id": "ollama",
   "label": "Ollama local",
   "base_url": "http://localhost:11434/v1",
-  "model": "qwen2.5-coder",
+  "model": "qwen2.5-coder:7b",
   "need_key": false,
   "private_ok": true
  },

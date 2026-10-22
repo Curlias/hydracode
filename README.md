@@ -11,7 +11,7 @@ git clone https://github.com/Curlias/hydracode.git
 cd hydracode && ./install.sh
 ```
 
-Por defecto instala también [Ollama](https://ollama.com) y descarga `qwen2.5-coder:1.5b` (~1 GB) como respaldo local sin cuota. Usa `./install.sh --no-ollama` para omitirlo. En Linux el instalador usa el script oficial de Ollama (`curl | sh`).
+Por defecto instala también [Ollama](https://ollama.com) y descarga `qwen2.5-coder:7b` (~4.7 GB) como respaldo local. Con menos de 16 GB de RAM baja solo a `3b` (~1.9 GB), y con menos de 8 GB a `1.5b`; `HYDRACODE_MODEL=... ./install.sh` fuerza uno como respaldo local sin cuota. Usa `./install.sh --no-ollama` para omitirlo. En Linux el instalador usa el script oficial de Ollama (`curl | sh`).
 
 Requiere Python 3.9+, sin dependencias externas.
 

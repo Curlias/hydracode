@@ -5,7 +5,7 @@
     "agy":          {"id":"agy","label":"Antigravity CLI","kind":"cli","cmd":["agy","-p","{prompt}"],"enabled":true,"private_ok":false},
     "claude-haiku": {"id":"claude-haiku","label":"Claude Haiku","kind":"cli","cmd":["claude","-p","{prompt}","--model","haiku"],"enabled":true,"private_ok":true},
     "claude-sonnet":{"id":"claude-sonnet","label":"Claude Sonnet","kind":"cli","cmd":["claude","-p","{prompt}","--model","sonnet"],"enabled":true,"private_ok":true},
-    "ollama":       {"id":"ollama","label":"Ollama local","kind":"openai","base_url":"http://localhost:11434/v1","model":"qwen2.5-coder:1.5b","need_key":false,"enabled":true,"private_ok":true},
+    "ollama":       {"id":"ollama","label":"Ollama local","kind":"openai","base_url":"http://localhost:11434/v1","model":"qwen2.5-coder:7b","need_key":false,"enabled":true,"private_ok":true},
     "codex":        {"id":"codex","label":"Codex (ChatGPT)","kind":"cli","cmd":["codex","exec","--skip-git-repo-check","-s","read-only","{prompt}"],"enabled":true,"private_ok":true}
   },
   "roles": {

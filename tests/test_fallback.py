@@ -38,5 +38,18 @@ class Fallback(unittest.TestCase):
         self.assertEqual(oct(os.stat(h.F["sec"]).st_mode)[-3:], "600")
 
 
+class Bar(unittest.TestCase):
+    def test_bar_renders_two_lines_without_crashing(self):
+        h.save_config({"providers": {"ok": dict(id="ok", **cli("print(1)"))}, "roles": {}})
+        out = h.bar('{"model":{"display_name":"Sonnet"},"context_window":{"used_percentage":34}}')
+        plain = __import__("re").sub(r"\x1b\[[0-9;]*m", "", out)
+        self.assertEqual(len(plain.splitlines()), 2)
+        self.assertIn("ctx", plain)
+        self.assertIn("34%", plain)
+
+    def test_bar_survives_empty_input(self):
+        self.assertIn("hydracode", h.bar(""))
+
+
 if __name__ == "__main__":
     unittest.main()
